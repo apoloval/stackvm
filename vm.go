@@ -20,9 +20,12 @@ func New(opts ...Option) *VirtualMachine {
 }
 
 // Run runs the virtual machine with a given function prototype.
-func (vm *VirtualMachine) Run(proto *FuncProto) ([]Value, error) {
+func (vm *VirtualMachine) Run(proto *FuncProto, args ...Value) ([]Value, error) {
 	if frame := vm.stack.currentFrame(); frame != nil {
 		return nil, fmt.Errorf("%w: VM is already running", ErrIllegalState)
+	}
+	for _, arg := range args {
+		vm.stack.push(arg)
 	}
 	vm.stack.newFrame(proto)
 

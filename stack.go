@@ -48,6 +48,19 @@ func (s *stack) currentFrame() *frame {
 	return &s.frames[len(s.frames)-1]
 }
 
+func (s *stack) dup(idx int) error {
+	if frame := s.currentFrame(); frame != nil {
+		idx += frame.stackBase
+	}
+	if idx < 0 {
+		return ErrStackUnderflow
+	}
+	if idx >= len(s.data) {
+		return ErrStackOverflow
+	}
+	return s.push(s.data[idx])
+}
+
 func (s *stack) push(item Value) error {
 	if len(s.data) >= s.limit {
 		return ErrStackOverflow
@@ -66,7 +79,15 @@ func (s *stack) pop() (Value, error) {
 	return item, nil
 }
 
-func (s *stack) popInt() (int, error) {
+func (s *stack) popBool() (bool, error) {
+	item, err := s.pop()
+	if err != nil {
+		return false, err
+	}
+	return item.AsBool()
+}
+
+func (s *stack) popInt() (int32, error) {
 	item, err := s.pop()
 	if err != nil {
 		return 0, err

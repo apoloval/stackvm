@@ -12,12 +12,12 @@ type Value struct {
 var NoValue = Value{t: TypeNone}
 
 // NewInt creates a new int value.
-func NewInt(v int) Value {
+func NewInt(v int32) Value {
 	return newValue(TypeInt, v)
 }
 
 // NewFloat creates a new float value.
-func NewFloat(v float64) Value {
+func NewFloat(v float32) Value {
 	return newValue(TypeFloat, v)
 }
 
@@ -38,19 +38,19 @@ func NewFunction(vm *VirtualMachine, proto *FuncProto) Value {
 }
 
 // AsInt returns the value as an int.
-func (v Value) AsInt() (int, error) {
+func (v Value) AsInt() (int32, error) {
 	if err := v.ensureType(TypeInt); err != nil {
 		return 0, err
 	}
-	return v.v.(int), nil
+	return v.v.(int32), nil
 }
 
 // AsFloat returns the value as a float.
-func (v Value) AsFloat() (float64, error) {
+func (v Value) AsFloat() (float32, error) {
 	if err := v.ensureType(TypeFloat); err != nil {
 		return 0, err
 	}
-	return v.v.(float64), nil
+	return v.v.(float32), nil
 }
 
 // AsBool returns the value as a bool.
