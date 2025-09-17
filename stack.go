@@ -48,7 +48,20 @@ func (s *stack) currentFrame() *frame {
 	return &s.frames[len(s.frames)-1]
 }
 
-func (s *stack) dup(idx int) error {
+func (s *stack) peek(idx int) (Value, error) {
+	if frame := s.currentFrame(); frame != nil {
+		idx += frame.stackBase
+	}
+	if idx < 0 {
+		return NoValue, ErrStackUnderflow
+	}
+	if idx >= len(s.data) {
+		return NoValue, ErrStackOverflow
+	}
+	return s.data[idx], nil
+}
+
+func (s *stack) poke(idx int, item Value) error {
 	if frame := s.currentFrame(); frame != nil {
 		idx += frame.stackBase
 	}
@@ -58,7 +71,8 @@ func (s *stack) dup(idx int) error {
 	if idx >= len(s.data) {
 		return ErrStackOverflow
 	}
-	return s.push(s.data[idx])
+	s.data[idx] = item
+	return nil
 }
 
 func (s *stack) push(item Value) error {
@@ -79,6 +93,22 @@ func (s *stack) pop() (Value, error) {
 	return item, nil
 }
 
+func (s *stack) popInt() (int32, error) {
+	item, err := s.pop()
+	if err != nil {
+		return 0, err
+	}
+	return item.AsInt()
+}
+
+func (s *stack) popFloat() (float32, error) {
+	item, err := s.pop()
+	if err != nil {
+		return 0, err
+	}
+	return item.AsFloat()
+}
+
 func (s *stack) popBool() (bool, error) {
 	item, err := s.pop()
 	if err != nil {
@@ -87,12 +117,12 @@ func (s *stack) popBool() (bool, error) {
 	return item.AsBool()
 }
 
-func (s *stack) popInt() (int32, error) {
+func (s *stack) popString() (string, error) {
 	item, err := s.pop()
 	if err != nil {
-		return 0, err
+		return "", err
 	}
-	return item.AsInt()
+	return item.AsString()
 }
 
 func (s *stack) popAll() []Value {

@@ -63,10 +63,12 @@ func (b *FuncProtoBuilder) Emit(inst Inst) InstPtr {
 	return InstPtr(len(b.bytecode) - 1)
 }
 
-// EmitWithFixup emits an instruction to the bytecode with a label fixup.
-func (b *FuncProtoBuilder) EmitWithFixup(inst Inst, label FuncProtoLabel) InstPtr {
-	instPtr := b.Emit(inst)
-	b.fixups[label].refs = append(b.fixups[label].refs, instPtr)
+// EmitBranch emits a branch instruction to the bytecode with a label.
+// This configures a fixup for the branch instruction to the given label.
+// The label must be marked before the function proto is built.
+func (b *FuncProtoBuilder) EmitBranch(to FuncProtoLabel) InstPtr {
+	instPtr := b.Emit(BR(0))
+	b.fixups[to].refs = append(b.fixups[to].refs, instPtr)
 	return instPtr
 }
 
